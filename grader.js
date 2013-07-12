@@ -86,19 +86,22 @@ if(require.main == module) {
 		}
 		else
 		{
-			console.log("Trying the URL method for %s", program.url );
+			//console.log("Trying the URL method for %s", program.url );
+			fileToProcess = URLHTMLFILENAME;
+			//console.log("File for Processing file %s", fileToProcess);
 			rest.get(program.url).on('complete', function(result) {
 				if (result instanceof Error) {
 					console.log("%s yielded an error. Exiting.", program.url);
 					process.exit(1); // http://nodejs.org/api/process.html#process_process_exit_code
-				} 
-			fs.writeFileSync(URLHTMLFILENAME, result); // should not go here
-			fileToProcess = URLHTMLFILENAME;
-		});
+				} else {
+					fs.writeFileSync(fileToProcess, result);
+				}
+			});
+		}
+		//console.log("Processing file %s", fileToProcess);
 		var checkJson = checkHtmlFile(fileToProcess, program.checks);
 		var outJson = JSON.stringify(checkJson, null, 4);
 		console.log(outJson);
-	}
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
