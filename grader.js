@@ -39,6 +39,10 @@ var assertFileExists = function(infile) {
 };
 
 var assertURLExists = function(url) {
+	return true;
+};
+/*
+var assertURLExists = function(url) {
     rest.get(url).on('complete', function(result) {
 		if (result instanceof Error) {
 			console.log("%s yielded an error. Exiting.", url);
@@ -47,7 +51,7 @@ var assertURLExists = function(url) {
 		fs.writeFileSync('retrievedHTML.html', result); // should not go here
 		}
 };
-
+*/
 
 var cheerioHtmlFile = function(htmlfile) {
     return cheerio.load(fs.readFileSync(htmlfile));
