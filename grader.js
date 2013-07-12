@@ -27,6 +27,7 @@ var program = require('commander');
 var cheerio = require('cheerio');
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
+var URLHTMLFILENAME = "retrievedHTML.html";
 var URL_DEFAULT = "";
 
 var assertFileExists = function(infile) {
@@ -39,19 +40,14 @@ var assertFileExists = function(infile) {
 };
 
 var assertURLExists = function(url) {
-	return true;
-};
-/*
-var assertURLExists = function(url) {
     rest.get(url).on('complete', function(result) {
 		if (result instanceof Error) {
 			console.log("%s yielded an error. Exiting.", url);
 			process.exit(1); // http://nodejs.org/api/process.html#process_process_exit_code
 		} 
-		fs.writeFileSync('retrievedHTML.html', result); // should not go here
-		}
+		fs.writeFileSync(URLHTMLFILENAME, result); // should not go here
+		});
 };
-*/
 
 var cheerioHtmlFile = function(htmlfile) {
     return cheerio.load(fs.readFileSync(htmlfile));
@@ -87,6 +83,13 @@ if(require.main == module) {
 	if(program.url == URL_DEFAULT)
 	{
 		var checkJson = checkHtmlFile(program.file, program.checks);
+		var outJson = JSON.stringify(checkJson, null, 4);
+		console.log(outJson);
+	}
+	else
+	{
+		console.log("Trying the URL method");
+		var checkJson = checkHtmlFile(URLHTMLFILENAME, program.checks);
 		var outJson = JSON.stringify(checkJson, null, 4);
 		console.log(outJson);
 	}
