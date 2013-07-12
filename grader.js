@@ -45,24 +45,6 @@ var assertURLExists = function(urlstring) {
 };
 
 
-var assertURLExistsNotWorking = function(url) {
-    var urlstring = url.toString();
-    console.log("Truing to load URL %s", urlstring);
-    rest.get(url).on('complete', function(result) {
-		if (result instanceof Error) {
-			console.log("%s yielded an error. Exiting.", url);
-			process.exit(1); // http://nodejs.org/api/process.html#process_process_exit_code
-		} else {
-	console.log("Made it this no errorfar returning %s", urlstring);
-		    }
-	//console.log(result.toString());
-	return urlstring;
-
-		//fs.writeFileSync(URLHTMLFILENAME, result); // should not go here
-		});
-};
-
-
 var cheerioHtmlFile = function(htmlfile) {
     return cheerio.load(fs.readFileSync(htmlfile));
 };
@@ -95,29 +77,27 @@ if(require.main == module) {
 		.option('-u, --url <page_url>', 'URL for page to test', clone(assertURLExists), URL_DEFAULT)
         .parse(process.argv);
 
-        console.log(program.file);
-        console.log(program.checks);
-        if(program.url == URL_DEFAULT)
-	{
-		var checkJson = checkHtmlFile(program.file, program.checks);
+		var fileToProcess = "";
+        if(program.url == URL_DEFAULT) {
+			fileToProcess = program.file;
+			//var checkJson = checkHtmlFile(program.file, program.checks);
+			//var outJson = JSON.stringify(checkJson, null, 4);
+			//console.log(outJson);
+		}
+		else
+		{
+			console.log("Trying the URL method for %s", program.url );
+			rest.get(program.url).on('complete', function(result) {
+				if (result instanceof Error) {
+					console.log("%s yielded an error. Exiting.", program.url);
+					process.exit(1); // http://nodejs.org/api/process.html#process_process_exit_code
+				} 
+			fs.writeFileSync(URLHTMLFILENAME, result); // should not go here
+			fileToProcess = URLHTMLFILENAME;
+		});
+		var checkJson = checkHtmlFile(fileToProcess, program.checks);
 		var outJson = JSON.stringify(checkJson, null, 4);
 		console.log(outJson);
-	}
-	else
-	{
-		console.log("Trying the URL method for %s", program.url );
-    rest.get(program.url).on('complete', function(result) {
-	if (result instanceof Error) {
-	    console.log("%s yielded an error. Exiting.", program.url);
-	    process.exit(1); // http://nodejs.org/api/process.html#process_process_exit_code
-	    } 
-	//console.log("Should log result here");
-	//console.log(result.toString());
-	fs.writeFileSync(URLHTMLFILENAME, result); // should not go here
-	});
-	var checkJson = checkHtmlFile(URLHTMLFILENAME, program.checks);
-	var outJson = JSON.stringify(checkJson, null, 4);
-	console.log(outJson);
 	}
 } else {
     exports.checkHtmlFile = checkHtmlFile;
